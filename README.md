@@ -1,5 +1,3 @@
-Here's a Markdown `README.md` file for your pig movement detection project:
-
 ```markdown
 # Pig Movement Detection with YOLO
 
