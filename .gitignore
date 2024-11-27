@@ -1,1 +1,8 @@
 *.zip
+*.bckp*
+*.csv
+Videokatalog
+PigMaps2
+old_video_files
+.venv
+__pycache__

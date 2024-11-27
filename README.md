@@ -32,6 +32,7 @@ pip install opencv-python-headless numpy ultralytics argparse
 - `video_path`: Path to the video file that you want to process (e.g., `video.mp4`).
 - `--fps`: Number of frames per second to process. Default is 1 (process every frame).
 - `--grayscale`: Optional flag to convert the output video to grayscale.
+- `--heatmap`: Optional flag to overlay a heatmap on the output video.
 
 ### Example
 
