@@ -39,7 +39,7 @@ pip install opencv-python-headless numpy ultralytics argparse
 To run the program, use the following command:
 
 ```bash
-python PigMaps.py video.mp4 --fps 2 --grayscale
+python PigMaps.py video.mp4 --fps 2 --heatmap
 ```
 
 This will process the `video.mp4`, process every 2nd frame, and convert the output to grayscale.
