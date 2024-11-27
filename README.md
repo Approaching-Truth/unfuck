@@ -32,14 +32,14 @@ pip install opencv-python-headless numpy ultralytics argparse
 - `video_path`: Path to the video file that you want to process (e.g., `video.mp4`).
 - `--fps`: Number of frames per second to process. Default is 1 (process every frame).
 - `--grayscale`: Optional flag to convert the output video to grayscale.
-- `--heatmap`: Optional flag to overlay a heatmap on the output video.
+- `--heatmap`: Optional flag to overlay a heatmap on the output video.g
 
 ### Example
 
 To run the program, use the following command:
 
 ```bash
-python detect_pig_behavior.py video.mp4 --fps 2 --grayscale
+python PigMaps.py video.mp4 --fps 2 --grayscale
 ```
 
 This will process the `video.mp4`, process every 2nd frame, and convert the output to grayscale.
@@ -59,7 +59,7 @@ This will process the `video.mp4`, process every 2nd frame, and convert the outp
 ## File Structure
 
 ```plaintext
-├── detect_pig_behavior.py  # Main script for processing the video
+├── PigMaps.py  # Main script for processing the video
 ├── Model_20_02_2024_V17Nano.pt  # Pre-trained YOLOv5 model
 └── README.md               # This documentation
 ```
@@ -84,6 +84,3 @@ This project is licensed under the MIT License.
 
 ```
 
-### Notes:
-- Adjust `Model_20_02_2024_V17Nano.pt` to the correct path of your YOLO model file.
-- Make sure you provide the correct path to your video when running the script.
