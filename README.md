@@ -59,9 +59,9 @@ This will process the `video.mp4`, process every 2nd frame, and convert the outp
 ## File Structure
 
 ```plaintext
-├── PigMaps.py  # Main script for processing the video
-├── Model_20_02_2024_V17Nano.pt  # Pre-trained YOLOv5 model
-└── README.md               # This documentation
+├── PigMaps.py 
+├── Model_20_02_2024_V17Nano.pt  
+              
 ```
 
 ## Example Output
