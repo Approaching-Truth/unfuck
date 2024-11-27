@@ -11,7 +11,7 @@ class CSVLogger:
         try:
             with open(self.filename, mode='w', newline='') as file:
                 writer = csv.writer(file)
-                writer.writerow(["Timestamp", "Frame", "Behavior", "Center"])
+                writer.writerow(["Timestamp", "Frame", "Behavior", "Center(x,y)"])
         except Exception as e:
             print(f"Error initializing CSV: {e}")
 
