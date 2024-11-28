@@ -8,7 +8,7 @@ class Parser:
         self.parser.add_argument('--fps', type=int, default=1, help='Number of frames per second to process.')
         self.parser.add_argument('--grayscale', action='store_true', help='Convert the output video to grayscale.')
         self.parser.add_argument('--heatmap', action='store_true', help='Enable heatmap generation for pig movement.')
-        self.parser.add_argument('--folder', type=str, help='Specify script to run on directory')
+        self.parser.add_argument('--headless', action='store_true', help='Run without video')
 
     def parse_args(self):
         # Call parse_args() on the ArgumentParser instance

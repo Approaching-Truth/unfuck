@@ -1,8 +1,18 @@
-*.zip
-*.bckp*
-*.csv
-Videokatalog
-PigMaps2
-old_video_files
-.venv
-__pycache__
+# Ignore everything
+/*
+PigMaps2/
+
+# Unignore specific files and directories
+!/.gitignore  # Ensure the .gitignore itself is tracked
+!LICENSE
+!README.md
+!Model_20_02_2024_V17Nano.pt
+
+# Unignore specific files in the src directory
+!src/
+!src/CSV.py
+!src/PigMaps.py
+!src/Print.py
+!src/pigParser.py
+
+# Optionally, you can add other files or directories to be tracked here
