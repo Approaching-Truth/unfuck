@@ -41,7 +41,7 @@ class PigMaps:
                 print("conf: " , pig_confidence)
                 # Detect behaviors based on interaction with faucets
                 self._detect_pig_behavior(pig_center, pig_box, movement_vector, top_faucets, pig_confidence, pig_id)
-                self.umath.update_prev_movement_vector(movement_vector, pig_id)
+                self.umath.update_prev_movement_vector(movement_vector, pig_center, pig_id)
 
         # Return filtered detections and behavior details
         return top_faucets, top_feces, top_pig, movement_vector, self.behavior

@@ -1,6 +1,9 @@
 # Ignore everything
 /*
 PigMaps2/
+__pycache__/
+*.pyc
+*.pyo
 
 # Unignore specific files and directories
 !/.gitignore  # Ensure the .gitignore itself is tracked

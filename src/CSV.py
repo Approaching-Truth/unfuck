@@ -20,8 +20,8 @@ class CSVLogger:
         """Create or reset the CSV file with headers, only if the file doesn't exist."""
         try:
             # Define the columns for the individual video CSV
-            header = ["Start-frame", "End-Frame", "start-time-min", "end-time-min", "Behavior", 
-                      "Pig-Center",  "Pig Conf","Faucet-1-Center", "Faucet-1-conf", "Faucet-2-Center", "Faucet-2-conf", 
+            header = ["Start-frame", "End-Frame", "start-time-min", "end-time-min", "Behavior", "Drinking-Duration",
+                      "Pig-Center",  "Pig-Conf","Faucet-1-Center", "Faucet-1-conf", "Faucet-2-Center", "Faucet-2-conf", 
                       "Feces-Center", "Feces-conf"]
             
             # Choose the appropriate filename
@@ -91,8 +91,8 @@ class CSVLogger:
                 feces_conf = confidences[3]
 
         # Calculate the drinking duration in minutes (assuming 24 FPS)
-        if start_frame and end_frame:
-            drinking_duration = (end_frame - start_frame) / 24.0 / 60.0  # Duration in minutes
+        
+        drinking_duration = (end_frame - start_frame) / 24.0   # Duration in minutes
 
         # Calculate the start time in minutes (start_frame / 24 FPS)
         start_time_minutes = start_frame / 24.0 / 60.0
