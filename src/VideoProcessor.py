@@ -1,43 +1,33 @@
 from PigMaps import PigMaps
 from Overlay import Overlay
 from FrameHandler import FrameHandler
-
-
+from ComputerVision import Draw
+from UsefulMath import UMath
 
 class VideoProcessor:
-    # Main processing function using the classes above
     def process_video(video_path, args, logger):
         frameHandler = FrameHandler(video_path)
         initialFrame = 0
         frame, _ = frameHandler.get_frame(args.fps, initialFrame)
-<<<<<<< Updated upstream
-        process_interval = int(frameHandler.getFps() / args.fps)  # Only process every Nth frame
-
-=======
         process_interval = int(frameHandler.get_fps() / args.fps)  # Only process every Nth frame
->>>>>>> Stashed changes
         pigMaps = PigMaps()
         overlay_handler = Overlay(frame)
+        draw = Draw()
+        umath = UMath()
         frame_count = initialFrame
+
+        logger_initialized = False  # Flag to track if loggerMessage has been initialized
+
         while frameHandler.cap.isOpened():
-            if frame is None:
-                print("here")
-                break
             frame, frame_count = frameHandler.get_frame(args.fps, frame_count)
-                # Skip frames based on --fps argument
+         
+            if frame is None:
+                break
+
+            # Skip frames based on --fps argument
             if frame_count % process_interval != 0:
                 continue
 
-<<<<<<< Updated upstream
-            detections = pigMaps.get_detections(frame)
-            pigs = pigMaps.get_pig_detection(detections)
-            frame = pigMaps.detect_behavior(frame, detections, frame_count, logger)
-
-            frame = overlay_handler.apply_overlay(pigs, frame, args)
-
-            frameHandler.showFrame(frame, args.headless)
-            if frameHandler.check_for_exit_key():
-=======
             # Assuming pigMaps.detect_behavior returns filtered top detections
             faucets, feces, pig, movement_vector, behavior = pigMaps.detect_behavior(frame)
             
@@ -103,7 +93,7 @@ class VideoProcessor:
 
 
             # If behavior ends (i.e., pig stops drinking), log the behavior
-            if logger_initialized and not behavior and logger.loggerMessage["start_frame"] is not None and frame_count > logger.loggerMessage["start_frame"] + 240:
+            if logger_initialized and not behavior and logger.loggerMessage["start_frame"] is not None and frame_count > logger.loggerMessage["start_frame"] + 150:
                 # Set the end frame when behavior stops and log the behavior
                 logger.loggerMessage["end_frame"] = frame_count
                 logger.log_behavior(logger.loggerMessage)
@@ -131,7 +121,10 @@ class VideoProcessor:
 
             # Check for exit key
             if frameHandler.check_for_key_press():
->>>>>>> Stashed changes
                 break
         
+        # Release the frame handler after processing
         frameHandler.release()
+
+
+ 

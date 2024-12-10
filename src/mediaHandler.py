@@ -17,15 +17,10 @@ def process_video_files_in_directory(input_path, output_folder, args, log_full_d
     video_files = [f for f in os.listdir(input_path)
                    if os.path.isfile(os.path.join(input_path, f)) and f.lower().endswith(('.mp4', '.avi', '.mov'))]
     
-<<<<<<< Updated upstream
-    for i, video_file in enumerate(video_files):
-        csv_filename = f"{i + 1}_of_{len(video_files)}.csv"
-=======
     for video_file in video_files:
         # Use the video file name (without extension) as the CSV filename
         csv_filename = f"{os.path.splitext(video_file)[0]}.csv"
         logger = CSVLogger(output_folder, csv_filename, log_full_day)
->>>>>>> Stashed changes
         video_path = os.path.join(input_path, video_file)
         
         # Initialize CSV logger for this video, with the log_full_day flag
