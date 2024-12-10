@@ -6,8 +6,13 @@ class PigMaps:
     classes = {0: 'Keeper', 1: 'Pig-laying', 2: 'Pig-standing', 3: 'Water-faucets', 4: 'feces'}
     chosen_model = YOLO("Model_20_02_2024_V17Nano.pt")  # Replace with the actual model path
 
+<<<<<<< Updated upstream
 
     def predict(self,chosen_model, img, conf=0.30):
+=======
+    def detect_behavior(self, img):
+        self.frame_count += 1
+>>>>>>> Stashed changes
         """
         Predict the classes of objects in an image using the YOLO model.
         """
@@ -56,6 +61,7 @@ class PigMaps:
         # Draw bounding box
         cv2.rectangle(img, (x1, y1), (x2, y2), color, 2)
 
+<<<<<<< Updated upstream
         # Draw label above the bounding box
         cv2.putText(img, label, (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, 2)
 
@@ -96,6 +102,26 @@ class PigMaps:
                     self.draw_bounding_and_behavior_box(img, pig_box, "Pig", behavior=behavior_text)
 
         return img
+=======
+        movement_vector = (0, 0)  # Default movement vector if no pigs are detected
+
+        # Process each pig detection
+        if top_pig:  # Only process if there are pigs detected
+            for pig in top_pig:  # Only process the pig with the highest confidence
+                pig_id, pig_box, pig_confidence = pig
+                pig_center = self.umath.get_center(pig_box)
+
+                prev_center = self.umath.get_prev_center(pig_id)
+                movement_vector = self.umath._calculate_movement_vector(pig_id, prev_center, pig_center)
+                print("conf: " , pig_confidence)
+                # Detect behaviors based on interaction with faucets
+                self._detect_pig_behavior(pig_center, pig_box, movement_vector, top_faucets, pig_confidence, pig_id)
+                self.umath.update_prev_movement_vector(movement_vector,pig_center, pig_id)
+
+        # Return filtered detections and behavior details
+        return top_faucets, top_feces, top_pig, movement_vector, self.behavior
+
+>>>>>>> Stashed changes
 
 
     def get_detections(self, img):
@@ -107,6 +133,7 @@ class PigMaps:
             model (YOLO model): The trained YOLO model to extract class names.
             target_classes (list): List of classes to filter, defaults to ["Pig-laying", "Pig-standing"].
 
+<<<<<<< Updated upstream
         Returns:
             list: A list of detections for the specified pig classes.
         """
@@ -123,3 +150,25 @@ class PigMaps:
         pigs = [det for det in detections if det[0] in target_classes]
         
         return pigs
+=======
+    def _detect_pig_behavior(self, pig_center, pig_box, movement_vector, faucets, pig_confidence, pig_id):
+        """Detect drinking and pooping behavior by checking IoU and movement angle with faucets."""
+        for i, faucet in enumerate(faucets):
+            faucet_box = faucet[1]
+            faucet_center = self.umath.get_center(faucet_box)
+            # Calculate behavior criteria for drinking
+            iou = self.umath.calculate_iou(pig_box, faucet_box)
+            dot_product = self.umath.calculate_dot_product(
+                movement_vector, (faucet_center[0] - pig_center[0], faucet_center[1] - pig_center[1])
+            )
+            area = self.umath.calculate_area_of_bbox(pig_box)
+            is_standing = self.umath.is_standing(pig_id, movement_vector)
+            print(self.umath.calculate_area_of_bbox(pig_box))
+            print(f"center: {pig_center} dot: {dot_product} iou: {iou} is standing: {is_standing} faucet_{i} conf: {faucet[2]} " )
+
+            if iou > 0.0001 and dot_product >= 600 and is_standing and area < 16900 and pig_confidence > 0.75:
+
+                self.behavior = "Drinking"
+                break  # No need to check other faucets once drinking behavior is detected
+            self.behavior = None
+>>>>>>> Stashed changes
