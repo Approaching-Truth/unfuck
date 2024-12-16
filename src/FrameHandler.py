@@ -60,3 +60,21 @@ class FrameHandler:
 
     def get_fps(self):
         return self.cap.get(cv2.CAP_PROP_FPS)  # Corrected to return the FPS value
+    
+    def save_img_to_folder(self, out_path, frame, frame_count):
+        """
+        Save the given frame to the specified folder with a unique filename based on the frame count.
+        
+        Args:
+            out_path (str): Path to the output folder.
+            frame (numpy.ndarray): Frame to save.
+            frame_count (int): Current frame count to generate unique filenames.
+        """
+        # Ensure the output path exists
+        os.makedirs(out_path, exist_ok=True)
+        
+        # Create a unique filename
+        file_name = f"frame_{frame_count:06d}.jpg"  # Zero-padded frame count for sorting
+        
+        # Save the frame
+        cv2.imwrite(os.path.join(out_path, file_name), frame)

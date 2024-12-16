@@ -32,7 +32,26 @@ class Draw:
         start_angle, end_angle = angle_range
         cv2.ellipse(
             img, pig_center, axes, direction_angle, start_angle, end_angle, self.colors["movement_cone"], 2
+
         )
+    def draw_movement_vector(self, img, pig_center, movement_vector, scale=20):
+        """
+        Draws an arrow representing the movement vector originating from the pig's center.
+        
+        Args:
+            img: The image to draw on.
+            pig_center: Coordinates (x, y) of the pig's center.
+            movement_vector: The movement vector as a tuple (dx, dy) representing the movement direction.
+            scale: A factor to scale the vector's length for better visualization.
+        """
+        # Scale the movement vector
+        vector_end = (int(pig_center[0] + movement_vector[0] * scale), 
+                      int(pig_center[1] + movement_vector[1] * scale))
+        
+        # Draw the arrow on the image
+        cv2.arrowedLine(img, pig_center, vector_end, self.colors["vector"], 3)
+        
+        return img
 
     def visualize_vectors(self, img, pig_center, faucet_center, dot_product):
         """

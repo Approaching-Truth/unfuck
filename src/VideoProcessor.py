@@ -3,9 +3,10 @@ from Overlay import Overlay
 from FrameHandler import FrameHandler
 from ComputerVision import Draw
 from UsefulMath import UMath
+from mqtt import MQTT
 
 class VideoProcessor:
-    def process_video(video_path, args, logger):
+    def process_video(video_path, args, logger,i):
         frameHandler = FrameHandler(video_path)
         initialFrame = 0
         frame, _ = frameHandler.get_frame(args.fps, initialFrame)
@@ -15,6 +16,8 @@ class VideoProcessor:
         draw = Draw()
         umath = UMath()
         frame_count = initialFrame
+        mqtt = MQTT()
+        out_path = f"/home/aevery/Documents/unfuck/Potential_Drinking{i}"
 
         logger_initialized = False  # Flag to track if loggerMessage has been initialized
 
@@ -54,7 +57,9 @@ class VideoProcessor:
                 dot2 = None
 
             
+            if behavior:
 
+                frameHandler.save_img_to_folder(out_path,frame, frame_count)
             # Initialize logger message only once when behavior starts
             if behavior and not logger_initialized:
                 logger.loggerMessage = {
@@ -93,24 +98,28 @@ class VideoProcessor:
 
 
             # If behavior ends (i.e., pig stops drinking), log the behavior
-            if logger_initialized and not behavior and logger.loggerMessage["start_frame"] is not None and frame_count > logger.loggerMessage["start_frame"] + 150:
+            if logger_initialized and not behavior and logger.loggerMessage["start_frame"] is not None and frame_count > logger.loggerMessage["start_frame"] + 240:
                 # Set the end frame when behavior stops and log the behavior
                 logger.loggerMessage["end_frame"] = frame_count
                 logger.log_behavior(logger.loggerMessage)
-
+                mqtt.publish_drinking(logger.loggerMessage.get("behavior"))
+                
                 # Reset logger initialization for the next behavior
                 logger_initialized = False
                 logger.loggerMessage["start_frame"] = None
                 logger.loggerMessage["end_frame"] = None
+
 
             # Draw the detection boxes on the frame
             frame = draw.draw_detection_box(frame, faucets)
             frame = draw.draw_detection_box(frame, feces)
             frame = draw.draw_detection_box(frame, pig, behavior)
             if dot1:
-                frame = draw.visualize_vectors(frame,pig_center, faucet_1,dot1)
+                 frame = draw.visualize_vectors(frame,pig_center, faucet_1,dot1)
             if dot2:
-                frame = draw.visualize_vectors(frame,pig_center, faucet_2,dot2)
+                 frame = draw.visualize_vectors(frame,pig_center, faucet_2,dot2)
+
+                 frame = draw.draw_movement_vector(frame,pig_center,movement_vector)
 
 
             # Apply overlay (if any)

@@ -1,6 +1,7 @@
 
 from UsefulMath import UMath
 from ModelHandler import ModelHandler
+from Print import Print
 
 class PigMaps:
     def __init__(self):
@@ -30,6 +31,24 @@ class PigMaps:
 
         movement_vector = (0, 0)  # Default movement vector if no pigs are detected
 
+
+        # Insert code to overwrite top_faucets using set_bbox_parameters
+        config_path = "src/config.yaml"  # Path to your YAML configuration file
+
+        # Fetch bounding boxes from config
+        left_faucet_bbox = self.umath.set_bbox_parameters(config_path, "faucet_left")
+        right_faucet_bbox = self.umath.set_bbox_parameters(config_path, "faucet_right")
+
+        left_faucet_bbox = self.umath.resize_bbox(10, left_faucet_bbox)
+        right_faucet_bbox = self.umath.resize_bbox(10,right_faucet_bbox)
+
+        # Replace top_faucets with the new values
+        top_faucets = [
+            ("Water-faucets", left_faucet_bbox, 99),
+            ("Water-faucets", right_faucet_bbox, 99)
+        ]
+
+
         # Process each pig detection
         if top_pig:  # Only process if there are pigs detected
             for pig in top_pig:  # Only process the pig with the highest confidence
@@ -38,7 +57,7 @@ class PigMaps:
 
                 prev_center = self.umath.get_prev_center(pig_id)
                 movement_vector = self.umath._calculate_movement_vector(pig_id, prev_center, pig_center)
-                print("conf: " , pig_confidence)
+                #print("conf: " , pig_confidence)
                 # Detect behaviors based on interaction with faucets
                 self._detect_pig_behavior(pig_center, pig_box, movement_vector, top_faucets, pig_confidence, pig_id)
                 self.umath.update_prev_movement_vector(movement_vector, pig_center, pig_id)
@@ -63,11 +82,11 @@ class PigMaps:
             )
             area = self.umath.calculate_area_of_bbox(pig_box)
             is_standing = self.umath.is_standing(pig_id, movement_vector)
-            print(self.umath.calculate_area_of_bbox(pig_box))
-            print(f"center: {pig_center} dot: {dot_product} iou: {iou} is standing: {is_standing}" )
-
-            if iou > 0 and dot_product >= 600 and is_standing and area < 16900 and pig_confidence > 0.75:
-
+            #print(self.umath.calculate_area_of_bbox(pig_box))
+            #print(f"center: {pig_center} dot: {dot_product} iou: {iou} is standing: {is_standing}" )
+            Print.print_detection_requirements(iou, dot_product, is_standing, pig_confidence)
+            if iou > 0 and dot_product and is_standing and pig_confidence > 0.45:
+                
                 self.behavior = "Drinking"
                 break  # No need to check other faucets once drinking behavior is detected
             self.behavior = None

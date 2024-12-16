@@ -1,7 +1,8 @@
 import math
+import yaml
 
 class UMath:
-    def __init__(self, movement_threshold=22, standing_threshold=10):
+    def __init__(self, movement_threshold=30, standing_threshold=10):
         self.MOVEMENT_THRESHOLD = movement_threshold
         self.STANDING_THRESHOLD = standing_threshold  # Threshold for standing still
         self.prev_movement_vector = {}
@@ -67,7 +68,6 @@ class UMath:
         current_magnitude = self.calculate_movement_magnitude(movement_vector)  # Magnitude of the current vector
 
         # Check if the difference in magnitudes is below a certain threshold
-        print(f"Prev Magnitude: {prev_magnitude}, Current Magnitude: {current_magnitude}")
 
         if abs(prev_magnitude - current_magnitude) < self.STANDING_THRESHOLD:
             return True  # Standing still if the change in magnitude is small
@@ -91,4 +91,58 @@ class UMath:
         self.prev_movement_vector[pig_id] = movement_vector
         self.pig_prev_centers[pig_id] = pig_center
 
+    def resize_bbox(self, percent: int, bbox):
+            """
+            Resize a bounding box by a given percentage.
 
+            Args:
+                percent (int): Percentage by which to resize the bounding box.
+                            Positive values increase size, negative decrease.
+                bbox (list or tuple): Bounding box [x_min, y_min, x_max, y_max].
+
+            Returns:
+                list: Resized bounding box [x_min, y_min, x_max, y_max].
+            """
+            x_min, y_min, x_max, y_max = bbox
+            width = x_max - x_min
+            height = y_max - y_min
+
+            delta_width = width * (percent / 100)
+            delta_height = height * (percent / 100)
+
+            new_x_min = int(x_min - delta_width / 2)
+            new_y_min = int(y_min - delta_height / 2)
+            new_x_max = int(x_max + delta_width / 2)
+            new_y_max = int(y_max + delta_height / 2)
+
+            return [new_x_min, new_y_min, new_x_max, new_y_max]
+
+    def set_bbox_parameters(self, config_path, bbox_name):
+        """
+        Read parameters from a config file and return the bounding box values.
+
+        Args:
+            config_path (str): Path to the configuration YAML file.
+            bbox_name (str): Name of the bounding box to retrieve (e.g., 'faucet_left').
+
+        Returns:
+            list: Bounding box [x_min, y_min, x_max, y_max].
+        """
+        try:
+            with open(config_path, 'r') as file:
+                config = yaml.safe_load(file)
+            
+            if bbox_name not in config:
+                raise ValueError(f"Error: Bounding box '{bbox_name}' not found in config.")
+            
+            bbox_params = config[bbox_name]
+            return [
+                bbox_params['xmin'],
+                bbox_params['ymin'],
+                bbox_params['xmax'],
+                bbox_params['ymax']
+            ]
+        except FileNotFoundError:
+            raise FileNotFoundError(f"Error: Config file not found at {config_path}.")
+        except KeyError as e:
+            raise KeyError(f"Error: Missing expected key in the configuration file: {e}")

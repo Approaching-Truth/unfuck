@@ -1,0 +1,22 @@
+mqtt:
+  host: assure.au-dev.dk
+  port: 1883
+  user: s1
+  password: passwordfors1
+
+topics:
+  drinking_behaviour: pig_monitor/section1/pi1/drinking_behaviour
+  
+
+
+faucet_left:
+  xmin: 559
+  xmax: 573
+  ymin: 80
+  ymax: 104
+
+faucet_right:
+  xmin: 583
+  xmax: 593
+  ymin: 305
+  ymax: 325
