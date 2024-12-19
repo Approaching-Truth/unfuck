@@ -5,6 +5,7 @@ from ComputerVision import Draw
 from UsefulMath import UMath
 from mqtt import MQTT
 
+
 class VideoProcessor:
     def process_video(video_path, args, logger,i):
         frameHandler = FrameHandler(video_path)

@@ -6,7 +6,7 @@ from mediaHandler import MediaHandler
 args = Parser().parse_args()
 
 # Extract the video path and other arguments
-input_path = args.video_path
+input_path = args.video_source
 
 # Handle video input (either folder or single video)
 media = MediaHandler()

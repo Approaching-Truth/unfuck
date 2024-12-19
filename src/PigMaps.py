@@ -32,8 +32,8 @@ class PigMaps:
         movement_vector = (0, 0)  # Default movement vector if no pigs are detected
 
 
-        # Insert code to overwrite top_faucets using set_bbox_parameters
-        config_path = "src/config.yaml"  # Path to your YAML configuration file
+        # Code to overwrite top_faucets using set_bbox_parameters (uncomment if needed)
+        # config_path = "src/config.yaml"  # Path to your YAML configuration file
 
         # # Fetch bounding boxes from config
         # left_faucet_bbox = self.umath.set_bbox_parameters(config_path, "faucet_left")
