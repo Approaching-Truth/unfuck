@@ -1,6 +1,3 @@
-Apologies for the confusion. Here's the corrected Markdown with all bash code blocks properly closed:
-
-markdown
 
 # Pig Movement Detection with YOLO
 
