@@ -35,18 +35,18 @@ class PigMaps:
         # Insert code to overwrite top_faucets using set_bbox_parameters
         config_path = "src/config.yaml"  # Path to your YAML configuration file
 
-        # Fetch bounding boxes from config
-        left_faucet_bbox = self.umath.set_bbox_parameters(config_path, "faucet_left")
-        right_faucet_bbox = self.umath.set_bbox_parameters(config_path, "faucet_right")
+        # # Fetch bounding boxes from config
+        # left_faucet_bbox = self.umath.set_bbox_parameters(config_path, "faucet_left")
+        # right_faucet_bbox = self.umath.set_bbox_parameters(config_path, "faucet_right")
 
-        left_faucet_bbox = self.umath.resize_bbox(10, left_faucet_bbox)
-        right_faucet_bbox = self.umath.resize_bbox(10,right_faucet_bbox)
+        # left_faucet_bbox = self.umath.resize_bbox(10, left_faucet_bbox)
+        # right_faucet_bbox = self.umath.resize_bbox(10,right_faucet_bbox)
 
-        # Replace top_faucets with the new values
-        top_faucets = [
-            ("Water-faucets", left_faucet_bbox, 99),
-            ("Water-faucets", right_faucet_bbox, 99)
-        ]
+        # # Replace top_faucets with the new values
+        # top_faucets = [
+        #     ("Water-faucets", left_faucet_bbox, 99),
+        #     ("Water-faucets", right_faucet_bbox, 99)
+        # ]
 
 
         # Process each pig detection
@@ -85,7 +85,7 @@ class PigMaps:
             #print(self.umath.calculate_area_of_bbox(pig_box))
             #print(f"center: {pig_center} dot: {dot_product} iou: {iou} is standing: {is_standing}" )
             Print.print_detection_requirements(iou, dot_product, is_standing, pig_confidence)
-            if iou > 0 and dot_product and is_standing and pig_confidence > 0.45:
+            if iou > 0.0035  and is_standing and pig_confidence > 0.45 and dot_product >= 600 :
                 
                 self.behavior = "Drinking"
                 break  # No need to check other faucets once drinking behavior is detected

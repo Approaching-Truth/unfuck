@@ -17,6 +17,7 @@ class VideoProcessor:
         umath = UMath()
         frame_count = initialFrame
         mqtt = MQTT()
+        additionalSeconds = 0
         out_path = f"/home/aevery/Documents/unfuck/Potential_Drinking{i}"
 
         logger_initialized = False  # Flag to track if loggerMessage has been initialized
@@ -59,14 +60,14 @@ class VideoProcessor:
             
             if behavior:
 
-                frameHandler.save_img_to_folder(out_path,frame, frame_count)
+                # frameHandler.save_img_to_folder(out_path,frame, frame_count)
+                additionalSeconds += 72
             # Initialize logger message only once when behavior starts
             if behavior and not logger_initialized:
                 logger.loggerMessage = {
                     "start_frame": frame_count,  # Set start frame when behavior starts
                     "end_frame": None,
                     "behavior": behavior,
-                    "center": pig_center,
                     "class": [],
                     "confidence": [],
                     "coordinates": {
@@ -98,7 +99,7 @@ class VideoProcessor:
 
 
             # If behavior ends (i.e., pig stops drinking), log the behavior
-            if logger_initialized and not behavior and logger.loggerMessage["start_frame"] is not None and frame_count > logger.loggerMessage["start_frame"] + 240:
+            if logger_initialized and not behavior and logger.loggerMessage["start_frame"] is not None and frame_count > logger.loggerMessage["start_frame"] + additionalSeconds:
                 # Set the end frame when behavior stops and log the behavior
                 logger.loggerMessage["end_frame"] = frame_count
                 logger.log_behavior(logger.loggerMessage)
@@ -108,6 +109,7 @@ class VideoProcessor:
                 logger_initialized = False
                 logger.loggerMessage["start_frame"] = None
                 logger.loggerMessage["end_frame"] = None
+                additionalSeconds = 0
 
 
             # Draw the detection boxes on the frame

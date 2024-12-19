@@ -2,7 +2,7 @@ import math
 import yaml
 
 class UMath:
-    def __init__(self, movement_threshold=30, standing_threshold=10):
+    def __init__(self, movement_threshold=10, standing_threshold=10):
         self.MOVEMENT_THRESHOLD = movement_threshold
         self.STANDING_THRESHOLD = standing_threshold  # Threshold for standing still
         self.prev_movement_vector = {}
