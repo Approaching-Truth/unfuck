@@ -1,5 +1,5 @@
 
-# Pig Movement Detection with YOLO
+# Pig Behavior Detection with YOLO
 
 This project leverages a pre-trained YOLOv8 model to analyze pig behavior (such as drinking or pooping) in video footage by examining the proximity between pigs and objects like water faucets or feces. The system processes video frames to detect objects, draw bounding boxes around them, and annotate the behaviors observed.
 
