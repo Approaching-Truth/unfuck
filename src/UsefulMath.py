@@ -2,7 +2,7 @@ import math
 import yaml
 
 class UMath:
-    def __init__(self, movement_threshold=10, standing_threshold=10):
+    def __init__(self, movement_threshold=4, standing_threshold=10):
         self.MOVEMENT_THRESHOLD = movement_threshold
         self.STANDING_THRESHOLD = standing_threshold  # Threshold for standing still
         self.prev_movement_vector = {}
@@ -116,6 +116,19 @@ class UMath:
             new_y_max = int(y_max + delta_height / 2)
 
             return [new_x_min, new_y_min, new_x_max, new_y_max]
+    def crop_image_to_bbox(self, img, bbox):
+        """
+        Crop the image to the specified bounding box.
+
+        Args:
+            img (numpy.ndarray): The input image.
+            bbox (list or tuple): Bounding box represented by [x_min, y_min, x_max, y_max].
+
+        Returns:
+            numpy.ndarray: Cropped image from the bounding box.
+        """
+        x_min, y_min, x_max, y_max = map(int, bbox)
+        return img[y_min:y_max, x_min:x_max]
 
     def set_bbox_parameters(self, config_path, bbox_name):
         """

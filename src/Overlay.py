@@ -1,5 +1,7 @@
 import numpy as np
 import cv2
+from mpl_toolkits.mplot3d import Axes3D
+import matplotlib.pyplot as plt
 
 class Overlay:
     def __init__(self, first_frame):
@@ -9,6 +11,8 @@ class Overlay:
             frame_shape (tuple): Shape of the video frame (height, width, channels).
         """
         self.heatmap = np.zeros_like(first_frame, dtype=np.float32)
+        self.z_data = np.zeros_like(first_frame[:, :, 0], dtype=np.float32)  # Store z values for 3D plot
+
     
     def get_center(self, box):
         """
@@ -23,25 +27,30 @@ class Overlay:
         cy = (y1 + y2) // 2
         return int(cx), int(cy)
 
+
     def updateHeatmap(self, pig_detections, radius=5):
-        """
-        Update the heatmap with new pig detections.
-        Args:
-            pig_detections (list): List of pig bounding boxes. Each detection is [x1, y1, x2, y2].
-            radius (int): Radius around each detected pig's center to increment heatmap values.
-        """
         for pig in [det for det in pig_detections if det[0] in ["Pig-laying", "Pig-standing"]]:
-            x1, y1, x2, y2 = map(int, pig[1])
+            # x1, y1, x2, y2 = map(int, pig[1])
             pig_center = self.get_center(pig[1])
 
-            # Define the size of the area to increment (e.g., a 10x10 region around the center)
-            heatmap_radius = 10  # You can adjust this value to make the dots larger or smaller
+            # Update both heatmap and z_data
+            heatmap_radius = 10
             for dx in range(-heatmap_radius, heatmap_radius + 1):
                 for dy in range(-heatmap_radius, heatmap_radius + 1):
-                    # Ensure the coordinates are within the frame dimensions
                     cx, cy = pig_center[0] + dx, pig_center[1] + dy
                     if 0 <= cx < self.heatmap.shape[1] and 0 <= cy < self.heatmap.shape[0]:
                         self.heatmap[cy, cx] += 1
+                        self.z_data[cy, cx] += 1  # Increment z for 3D representation
+
+    def get_3d_data(self):
+        """
+        Retrieve the 3D data for plotting.
+        Returns:
+            tuple: X, Y, Z data for 3D plotting.
+        """
+        y, x = np.mgrid[0:self.heatmap.shape[0], 0:self.heatmap.shape[1]]
+        z = self.z_data
+        return x, y, z
 
     def normalizeHeatmap(self):
         """
@@ -65,10 +74,8 @@ class Overlay:
         heatmap_display = cv2.applyColorMap(self.normalizeHeatmap(), cv2.COLORMAP_JET)
         heatmap_display = cv2.resize(heatmap_display, (frame.shape[1], frame.shape[0]))
 
-        return  cv2.addWeighted(frame, alpha, heatmap_display, 1 - alpha, 0)
+        return cv2.addWeighted(frame, alpha, heatmap_display, 1 - alpha, 0)
 
-    
-    
     def convert_to_grayscale(self, frame):
         """
         Convert a video frame to grayscale.
@@ -88,3 +95,28 @@ class Overlay:
         if args.grayscale:
             frame = self.convert_to_grayscale(frame)
         return frame
+
+    def plot_3d_heatmap(self):
+        """
+        Plot the 3D heatmap of pig activity based on the accumulated data.
+        """
+        fig = plt.figure(figsize=(10, 10))
+        ax = fig.add_subplot(111, projection='3d')
+
+        x, y, z = self.get_3d_data()
+        
+        # Plot the surface.
+        surf = ax.plot_surface(x, y, z, cmap='viridis', edgecolor='none')
+        
+        # Customize the z axis.
+        ax.set_zlim(np.min(z), np.max(z))
+        ax.zaxis.set_major_locator(plt.MaxNLocator(5))
+        
+        # Add a color bar which maps values to colors.
+        fig.colorbar(surf, shrink=0.5, aspect=5)
+
+        ax.set_xlabel('X')
+        ax.set_ylabel('Y')
+        ax.set_zlabel('Intensity')
+        plt.title('3D Heatmap of Pig Activity')
+        plt.show()

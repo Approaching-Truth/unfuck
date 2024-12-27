@@ -1,22 +1,47 @@
+confusion:
+  predicted:
+  - null
+  - 0
+  - 0
+  - 0
+  - 1
+  - 0
+  - 1
+  - 0
+  - 0
+  - 0
+  - 0
+  - 1
+  - 0
+  - 1
+  - 1
+  - 1
+  - 1
+  - 1
+  - 0
+  - 1
+  - 1
+  - 1
+  - 0
+  - 1
+  - 0
+  - 1
+  - 1
+  - 0
+faucet_left:
+  xmax: 573
+  xmin: 559
+  ymax: 104
+  ymin: 80
+faucet_right:
+  xmax: 593
+  xmin: 583
+  ymax: 325
+  ymin: 305
 mqtt:
   host: assure.au-dev.dk
+  password: passwordfors1
   port: 1883
   user: s1
-  password: passwordfors1
-
 topics:
   drinking_behaviour: pig_monitor/section1/pi1/drinking_behaviour
-  
-
-
-faucet_left:
-  xmin: 559
-  xmax: 573
-  ymin: 80
-  ymax: 104
-
-faucet_right:
-  xmin: 583
-  xmax: 593
-  ymin: 305
-  ymax: 325

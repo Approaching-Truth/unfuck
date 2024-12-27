@@ -10,6 +10,7 @@ __pycache__/
 !LICENSE
 !README.md
 !Model_20_02_2024_V17Nano.pt
+!yolo11.pt
 
 # Unignore specific files in the src directory
 !src/

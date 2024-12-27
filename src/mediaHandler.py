@@ -12,14 +12,17 @@ class MediaHandler:
         if parsed_url.scheme:
             folder_name = parsed_url.netloc or "stream"
         else:
-            folder_name = os.path.basename(input_path)
+            # If it's a file path, use the parent directory name
+            parent_dir = os.path.basename(os.path.dirname(input_path))
+            folder_name = parent_dir if parent_dir else os.path.basename(input_path)
         
-        output_folder = os.path.join(output_base, folder_name + "Data")
+        # Append -Data to the folder name
+        output_folder = os.path.join(output_base, f"{folder_name}-Data")
         os.makedirs(output_folder, exist_ok=True)
         print(f"Output folder created at: {output_folder}")
         return output_folder
 
-    def process_video_files_in_directory(self, input_path, output_folder, args, log_full_day=True):
+    def process_video_files_in_directory(self, input_path, output_base, args, log_full_day=True):
         """Process all video files in a given directory."""
         video_files = [f for f in os.listdir(input_path)
                        if os.path.isfile(os.path.join(input_path, f)) and f.lower().endswith(('.mp4', '.avi', '.mov'))]
@@ -27,11 +30,15 @@ class MediaHandler:
         for i, video_file in enumerate(video_files):
             # Use the video file name (without extension) as the CSV filename
             csv_filename = f"{os.path.splitext(video_file)[0]}.csv"
+            
+            # Create the output folder for each video based on the directory name
+            video_full_path = os.path.join(input_path, video_file)
+            output_folder = self.create_output_folder(video_full_path, output_base)
+            
             logger = CSVLogger(output_folder, csv_filename, log_full_day)
-            video_path = os.path.join(input_path, video_file)
             
             # Initialize CSV logger for this video, with the log_full_day flag
-            VideoProcessor.process_video(video_path, args, logger, i+300)
+            VideoProcessor.process_video(video_full_path, args, logger, i+300)
 
     def process_single_video(self, input_path, output_base, args):
         """Process a single video file or URL and create the output folder."""
@@ -62,11 +69,11 @@ class MediaHandler:
             self.process_single_video(input_path, output_base, args)
         elif os.path.isdir(input_path):
             print("Processing directory...")
-            output_folder = self.create_output_folder(input_path, output_base)
-            self.process_video_files_in_directory(input_path, output_folder, args)
+            # Here, we use input_path directly as the directory to process, 
+            # but we pass output_base to create_output_folder to get the right naming for each video
+            self.process_video_files_in_directory(input_path, output_base, args)
         elif os.path.isfile(input_path):
             print("Processing single video file...")
             self.process_single_video(input_path, output_base, args)
         else:
             print(f"Error: {input_path} is not a valid file, folder, or URL.")
-

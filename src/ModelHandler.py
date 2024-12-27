@@ -2,8 +2,8 @@ from ultralytics import YOLO
 import sys, os
 
 class ModelHandler:
-    def __init__(self):
-        self.chosen_model = YOLO("Model_20_02_2024_V17Nano.pt")  # Replace with the actual model path
+    def __init__(self, model_path = "Model_20_02_2024_V17Nano.pt"):
+        self.chosen_model = YOLO(model_path)  # Replace with the actual model path
         self.conf = 0.30  # Confidence threshold
 
     def get_detections(self, img):

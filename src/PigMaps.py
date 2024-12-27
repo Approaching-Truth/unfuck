@@ -1,12 +1,13 @@
-
 from UsefulMath import UMath
 from ModelHandler import ModelHandler
 from Print import Print
+import cv2  # Import cv2 for image manipulation and display
 
 class PigMaps:
     def __init__(self):
         self.umath = UMath()
         self.model_handler = ModelHandler()  # Use ModelHandler instance for detections
+        self.model_handler_behavior = ModelHandler("yolo11.pt")
         self.behavior = None
         self.frame_count = 0  # Initialize frame count
 
@@ -23,6 +24,16 @@ class PigMaps:
         pigs = sorted(self.model_handler.get_pig_detection(detections), key=lambda x: x[2], reverse=True)
         faucets = sorted(self.model_handler.get_faucet_detection(detections), key=lambda x: (x[2], x[1]), reverse=True)  # Sort by confidence, then by center
         feces = sorted(self.model_handler.get_feces_detection(detections), key=lambda x: (x[2], x[1]), reverse=True)  # Sort by confidence, then by center
+        
+        # Resize the bounding boxes for faucets
+        resized_faucets = []
+        for faucet in faucets:
+            class_name, bbox, confidence = faucet
+            resized_bbox = self.umath.resize_bbox(150, bbox)  # 100% increase in size
+            resized_faucets.append((class_name, resized_bbox, confidence))
+        
+        # Use the resized faucets for further processing
+        faucets = resized_faucets
 
         # Select top detections
         top_pig = pigs[:1]  # Highest confidence pig
@@ -30,24 +41,6 @@ class PigMaps:
         top_feces = feces[:1]  # Highest confidence feces
 
         movement_vector = (0, 0)  # Default movement vector if no pigs are detected
-
-
-        # Code to overwrite top_faucets using set_bbox_parameters (uncomment if needed)
-        # config_path = "src/config.yaml"  # Path to your YAML configuration file
-
-        # # Fetch bounding boxes from config
-        # left_faucet_bbox = self.umath.set_bbox_parameters(config_path, "faucet_left")
-        # right_faucet_bbox = self.umath.set_bbox_parameters(config_path, "faucet_right")
-
-        # left_faucet_bbox = self.umath.resize_bbox(10, left_faucet_bbox)
-        # right_faucet_bbox = self.umath.resize_bbox(10,right_faucet_bbox)
-
-        # # Replace top_faucets with the new values
-        # top_faucets = [
-        #     ("Water-faucets", left_faucet_bbox, 99),
-        #     ("Water-faucets", right_faucet_bbox, 99)
-        # ]
-
 
         # Process each pig detection
         if top_pig:  # Only process if there are pigs detected
@@ -57,21 +50,16 @@ class PigMaps:
 
                 prev_center = self.umath.get_prev_center(pig_id)
                 movement_vector = self.umath._calculate_movement_vector(pig_id, prev_center, pig_center)
-                #print("conf: " , pig_confidence)
+                
                 # Detect behaviors based on interaction with faucets
-                self._detect_pig_behavior(pig_center, pig_box, movement_vector, top_faucets, pig_confidence, pig_id)
+                self._detect_pig_behavior(img, pig_center, pig_box, movement_vector, top_faucets, pig_confidence, pig_id)
                 self.umath.update_prev_movement_vector(movement_vector, pig_center, pig_id)
 
         # Return filtered detections and behavior details
         return top_faucets, top_feces, top_pig, movement_vector, self.behavior
 
-
-
-
-    
-
-    def _detect_pig_behavior(self, pig_center, pig_box, movement_vector, faucets, pig_confidence,pig_id):
-        """Detect drinking and pooping behavior by checking IoU and movement angle with faucets."""
+    def _detect_pig_behavior(self, img, pig_center, pig_box, movement_vector, faucets, pig_confidence, pig_id):
+        """Detect drinking behavior by checking IoU, movement vector magnitude, and using the behavior model."""
         for faucet in faucets:
             faucet_box = faucet[1]
             faucet_center = self.umath.get_center(faucet_box)
@@ -80,15 +68,39 @@ class PigMaps:
             dot_product = self.umath.calculate_dot_product(
                 movement_vector, (faucet_center[0] - pig_center[0], faucet_center[1] - pig_center[1])
             )
-            area = self.umath.calculate_area_of_bbox(pig_box)
             is_standing = self.umath.is_standing(pig_id, movement_vector)
-            #print(self.umath.calculate_area_of_bbox(pig_box))
-            #print(f"center: {pig_center} dot: {dot_product} iou: {iou} is standing: {is_standing}" )
+            
             Print.print_detection_requirements(iou, dot_product, is_standing, pig_confidence)
-            if iou > 0.0035  and is_standing and pig_confidence > 0.45 and dot_product >= 600 :
+            
+            if iou > 0.0035 and is_standing and pig_confidence > 0.45:
+                # Crop the image to the pig's bounding box for behavior detection
+                results = self.model_handler_behavior.get_detections(img)
                 
-                self.behavior = "Drinking"
-                break  # No need to check other faucets once drinking behavior is detected
-            self.behavior = None
+                # # Annotate the cropped image with detection results
+                # annotated_img = img.copy()
+                # for result in results:
+                #     class_name, bbox, confidence = result
+                #     x1, y1, x2, y2 = map(int, bbox)
+                #     color = (0, 255, 0) if class_name == "Drinking" else (0, 0, 255)  # Green for Drinking, Red for others
+                #     cv2.rectangle(annotated_img, (x1, y1), (x2, y2), color, 2)
+                #     cv2.putText(annotated_img, f"{class_name}: {confidence:.2f}", (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, 2)
 
-
+                # # Show the annotated image and wait for input
+                # cv2.imshow('Cropped Pig Behavior Detection', annotated_img)
+                # cv2.waitKey(0)  # Wait indefinitely for a key press
+                # cv2.destroyAllWindows()
+                
+                # Check if drinking is detected with sufficient confidence
+                drinking_detected = False
+                for result in results:
+                    class_name, _, confidence = result
+                    if class_name == "Drinking" and confidence > 0.85:
+                        drinking_detected = True
+                    elif class_name == "Idle" and confidence >= 0.5:  # If idle is detected with equal or higher confidence, we don't consider it drinking
+                        drinking_detected = False
+                        break
+                
+                if drinking_detected:
+                    self.behavior = "Drinking"
+                    break  # No need to check other faucets once drinking behavior is detected
+            self.behavior = "Idle"
