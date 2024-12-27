@@ -1,86 +1,87 @@
-```markdown
-# Pig Movement Detection with YOLO
 
-This project uses a pre-trained YOLOv8 model to detect pig behavior (e.g., drinking, pooping) in videos by analyzing the proximity between pigs and other objects such as water faucets or feces. The program processes video frames to identify objects, draw bounding boxes, and label the detected behaviors.
+# Pig Behavior Detection with YOLO
+
+This project leverages a pre-trained YOLOv8 model to analyze pig behavior (such as drinking or pooping) in video footage by examining the proximity between pigs and objects like water faucets or feces. The system processes video frames to detect objects, draw bounding boxes around them, and annotate the behaviors observed.
 
 ## Features
-- Detects pigs, water faucets, and feces in the video.
-- Identifies pig behaviors like drinking and pooping based on proximity to specific objects.
-- Provides options to:
-  - Adjust the number of frames per second to process (`--fps`).
-  - Convert the output video to grayscale (`--grayscale`).
-- Uses the YOLOv5 object detection model for predictions.
+- Detects pigs, water faucets, and feces within video streams or files.
+- Identifies behaviors like drinking and pooping based on the spatial relationship between objects.
+- Provides customization options:
+  - Adjust the processing frame rate with `--fps`.
+  - Convert video output to grayscale using `--grayscale`.
+  - Apply a heatmap overlay with `--heatmap`.
+- Supports both live video streams and local video files.
+- Uses the YOLOv8 model for object detection.
 
 ## Requirements
 
 - Python 3.x
 - OpenCV
 - NumPy
-- Ultralitycs YOLOv5
+- Ultralytics for YOLOv8
 - argparse
 
-You can install the required libraries using the following:
+Install the necessary libraries with:
 
 ```bash
 pip install opencv-python-headless numpy ultralytics argparse
 ```
 
 ## Usage
+Command-Line Arguments
 
-### Command-Line Arguments
+    video_source: Path to the video file or URL for a live stream.
+    --fps: Frames per second to process. Defaults to 1 (every frame).
+    --grayscale: Flag to convert the output to grayscale.
+    --heatmap: Flag to add a heatmap overlay to the video.
+    --live: Indicates if the video source is a live stream.
+    --headless: Run without displaying video (useful for background processing).
 
-- `video_path`: Path to the video file that you want to process (e.g., `video.mp4`).
-- `--fps`: Number of frames per second to process. Default is 1 (process every frame).
-- `--grayscale`: Optional flag to convert the output video to grayscale.
-- `--heatmap`: Optional flag to overlay a heatmap on the output video.g
 
-### Example
-
-To run the program, use the following command:
+## Example
+To process a video file:
 
 ```bash
-python PigMaps.py video.mp4 --fps 2 --heatmap
+
+python main.py video.mp4 --fps 2 --heatmap
 ```
 
-This will process the `video.mp4`, process every 2nd frame, and convert the output to grayscale.
+For a live stream:
+
+```bash
+
+python main.py "rtsp://your_stream_url" --live --fps 1
+```
 
 ## How It Works
 
-1. **Loading the YOLO Model**: The model (`Model_20_02_2024_V17Nano.pt`) is loaded using the `YOLO` class from the `ultralytics` library.
-   
-2. **Prediction**: The model predicts objects (such as pigs, water faucets, and feces) within each video frame.
-   
-3. **Behavior Detection**: The proximity between pigs and water faucets or feces is calculated. If the distance is below a specified threshold, it is classified as "Drinking" or "Pooping."
+    Loading the YOLO Model: The YOLOv8 model (Model_20_02_2024_V17Nano.pt) is loaded for object detection.
+    Frame Acquisition: For video files, frames are read sequentially; for streams, frames are captured as they come.
+    Prediction: The model detects objects in each frame (pigs, faucets, feces).
+    Behavior Analysis: Calculates proximity, movement vectors, and uses these to determine if behaviors like drinking or pooping are occurring.
+    Visualization: Draws bounding boxes, labels behaviors, and optionally applies overlays like heatmaps.
+    Output: Displays or saves frames with annotations depending on command-line options.
 
-4. **Bounding Boxes & Labels**: Bounding boxes are drawn around the detected objects, and behavior labels like "Behavior: Drinking" or "Behavior: Pooping" are added to the frames.
-
-5. **Output**: The processed video is displayed frame-by-frame with the annotations.
 
 ## File Structure
-
-```plaintext
-├── PigMaps.py 
-├── Model_20_02_2024_V17Nano.pt  
-              
+```bash
+├── src/
+│   ├── PigMaps.py
+│   ├── Overlay.py
+│   ├── FrameHandler.py
+│   ├── ComputerVision.py
+│   ├── UsefulMath.py
+│   ├── mqtt.py
+│   ├── CSV.py
+│   ├── config.yaml
+│   ├── mediaHandler.py
+│   ├── main.py
+│   └── pigParser.py
+└── Model_20_02_2024_V17Nano.pt
 ```
 
-## Example Output
 
-While running, the program will show the video with bounding boxes around detected objects and behavior annotations such as:
 
-- **Pig-laying**: Bounding box around a pig that is laying down.
-- **Pig-standing**: Bounding box around a pig that is standing.
-- **Behavior: Drinking**: Label when the pig is close to a water faucet.
-- **Behavior: Pooping**: Label when the pig is near feces.
 
-## Troubleshooting
-
-- **Error: Could not open video**: Ensure the path to the video file is correct.
-- **Slow performance**: Try lowering the FPS using the `--fps` argument to process fewer frames.
-
-## License
-
+License
 This project is licensed under the MIT License.
-
-```
-
