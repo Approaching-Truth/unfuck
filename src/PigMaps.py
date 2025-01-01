@@ -35,7 +35,6 @@ class PigMaps:
         # Use the resized faucets for further processing
         faucets = resized_faucets
 
-        print("resized faucets: " , faucets)
 
         # Select top detections
         top_pig = pigs[:1]  # Highest confidence pig
@@ -73,7 +72,7 @@ class PigMaps:
             )
             is_standing = self.umath.is_standing(pig_id, movement_vector)
             
-            Print.print_detection_requirements(iou, dot_product, is_standing, pig_confidence)
+            # Print.print_detection_requirements(iou, dot_product, is_standing, pig_confidence)
             if iou > 0.0035 and is_standing == True and pig_confidence > 0.45:
                 # Crop the image to the pig's bounding box for behavior detection
                 results = self.model_handler_behavior.get_detections(img)
@@ -114,6 +113,9 @@ class PigMaps:
     def do_drinking_detection(self, img, best_pig_detection, best_faucet_detection):
         model1_drinking_detected = False
         model2_drinking_detected = False
+        pig_center =None
+        pig_id=None
+        movement_vector=None
 
         # Resize the bounding boxes for faucets ( bigger hot zone)
         resized_faucets = []
@@ -124,7 +126,6 @@ class PigMaps:
         
         # Use the resized faucets for further processing
         best_faucet_detection = resized_faucets
-        print("do_drinking: best pig: ", best_pig_detection)
         for faucet in best_faucet_detection:
             faucet_name, faucet_box, faucet_confidence = faucet
 
@@ -160,7 +161,6 @@ class PigMaps:
                         self.behavior = "Drinking"
                         break  # No need to check other pigs for this faucet if drinking is detected
 
-                self.umath.update_prev_movement_vector(movement_vector, pig_center, pig_id)
 
             # If we've broken out of the inner loop due to drinking detection, we don't need to continue checking other faucets
             if self.behavior == "Drinking":
@@ -171,8 +171,7 @@ class PigMaps:
             self.behavior = "Idle"
 
         print("Model 1:", model1_drinking_detected, "  Model2:", model2_drinking_detected)
-        cv2.waitKey(0)
+        self.umath.update_prev_movement_vector(movement_vector, pig_center, pig_id)
 
         # Assuming you want to return the last pig and faucet checked or the one where drinking was detected
-        print(self.behavior)
         return model1_drinking_detected, model2_drinking_detected, pig_confidence, faucet_confidence, self.behavior

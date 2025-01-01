@@ -24,6 +24,11 @@ confusion:
   - 1
   - 1
   - 1
+  - 1
+  - 0
+  - 1
+  - 1
+  - 1
 faucet_left:
   xmax: 573
   xmin: 559
