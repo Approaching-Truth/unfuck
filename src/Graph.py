@@ -47,6 +47,3 @@ class BehaviourGraph:
         self.plot_behavior_over_time()
 
     
-# Usage example:
-# grapher = BehaviourGraph()
-# grapher.show_plots_separately()

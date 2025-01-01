@@ -66,7 +66,9 @@ class VideoProcessor:
                 prev_frame = frame.copy()
             else:
                 # Assuming pigMaps.detect_behavior returns filtered top detections
-                faucets, feces, pig, movement_vector, behavior = pigMaps.detect_behavior(frame)
+                faucets, feces, pig, movement_vector, behavior2 = pigMaps.detect_behavior(frame)
+                print("faucets : ", faucets)
+                model1, model2, confpig, conffau, behavior =pigMaps.do_drinking_detection(frame,pig,faucets)
                 
                 # Get center coordinates
                 pig_center = umath.get_center(pig[0][1]) if pig else None

@@ -31,11 +31,23 @@ class Print:
             print(f"Frame {frame_count}: {behavior} detected.")
 
     @staticmethod
+
     def print_detection_requirements(iou, dot_product, is_standing, pig_confidence):
         """
-        Print the detection criteria for pig behavior.
+        Print the detection criteria for pig behavior from _detect_pig_behavior function.
         """
-        print(f"IoU: {iou}")
-        print(f"Dot Product: {dot_product}")
-        print(f"Is Standing: {is_standing}")
-        print(f"Pig Confidence: {pig_confidence}")
+        print(f"Behavior Detection Criteria:")
+        print(f"  IoU: {iou:.4f}")
+        print(f"  Dot Product: {dot_product:.4f}")
+        print(f"  Is Standing: {is_standing}")
+        print(f"  Pig Confidence: {pig_confidence:.4f}")
+    @staticmethod
+    def print_do_detection_requirements(iou, is_standing, pig_confidence, faucet_confidence):
+        """
+        Print the detection criteria for pig behavior from do_drinking_detection function.
+        """
+        print(f"Do Detection Criteria:")
+        print(f"  IoU: {iou:.4f}")
+        print(f"  Is Standing: {is_standing}")
+        print(f"  Pig Confidence: {pig_confidence:.4f}")
+        print(f"  Faucet Confidence: {faucet_confidence:.4f}")
