@@ -93,7 +93,6 @@ class VideoProcessor:
                 if behavior:
                     # Update the last entry in y_pred to 1 if drinking detected
                     config['confusion']['predicted'][-1] = 1
-                    
                     # Save the updated config to reflect the new value
                     config_file_path = 'src/config.yaml'  # Use the same path as when loading
                     with open(config_file_path, 'w') as file:
@@ -172,4 +171,4 @@ class VideoProcessor:
         
         # Release the frame handler after processing
         frameHandler.release()
-        overlay_handler.plot_3d_heatmap()
+        # overlay_handler.plot_3d_heatmap()

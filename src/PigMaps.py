@@ -41,6 +41,7 @@ class PigMaps:
         top_feces = feces[:1]  # Highest confidence feces
 
         movement_vector = (0, 0)  # Default movement vector if no pigs are detected
+        self.do_drinking_detection(img,top_pig,faucet)
 
         # Process each pig detection
         if top_pig:  # Only process if there are pigs detected
@@ -104,3 +105,51 @@ class PigMaps:
                     self.behavior = "Drinking"
                     break  # No need to check other faucets once drinking behavior is detected
             self.behavior = "Idle"
+
+
+    def do_drinking_detection(self, img, best_pig_detection, best_faucet_detection):
+        print(best_faucet_detection)
+        for faucet in best_faucet_detection:
+            print(faucet, " isn't " , best_faucet_detection)
+            faucet_name, faucet_box, faucet_confidence = faucet
+
+
+            for pig in best_pig_detection:
+                pig_id, pig_box, pig_confidence = pig
+
+                #calculate IOU and Movement vector magnitude
+                iou = self.umath.calculate_iou(pig_box, faucet_box)
+                prev_center = self.umath.get_prev_center(pig_id)
+                pig_center = self.umath.get_center(pig_box)
+                movement_vector = self.umath._calculate_movement_vector(pig_id, prev_center, pig_center)
+                is_standing = self.umath.is_standing(pig_id, movement_vector)
+                self.umath.update_prev_movement_vector(movement_vector, pig_center, pig_id)
+
+                
+                #model 1 check
+                if iou > 0.0035 and is_standing and pig_confidence > 0.45 and faucet_confidence > 0.80:
+                    model1_drinking_detected = True
+
+                    results = self.model_handler_behavior.get_detections(img)
+            
+                    
+                    # Check if model 2 drinking is detected with sufficient confidence
+                    model2_drinking_detected = False
+                    for result in results:
+                        class_name, _, confidence = result
+                        if class_name == "Drinking" and confidence > 0.85:
+                            model2_drinking_detected = True
+                        elif class_name == "Idle" and confidence >= 0.5:  # If idle is detected with equal or higher confidence, we don't consider it drinking
+                            model2_drinking_detected = False
+                            break
+                    
+                    if model2_drinking_detected:
+                        self.behavior = "Drinking"
+                        
+                        break  # No need to check other faucets once drinking behavior is detected
+                    self.behavior = "Idle"
+                    
+                #returnerer 2 bools og confidence af den gris der drak og det faucet den drak ved samt en string der representere dens behavior
+                return model1_drinking_detected, model2_drinking_detected, pig_confidence, faucet_confidence, self.behavior
+
+

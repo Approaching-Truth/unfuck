@@ -2,6 +2,7 @@ import os
 from urllib.parse import urlparse
 from CSV import CSVLogger
 from VideoProcessor import VideoProcessor
+from Overlay import Overlay
 
 class MediaHandler:
 
