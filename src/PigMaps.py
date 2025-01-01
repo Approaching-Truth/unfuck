@@ -114,7 +114,16 @@ class PigMaps:
     def do_drinking_detection(self, img, best_pig_detection, best_faucet_detection):
         model1_drinking_detected = False
         model2_drinking_detected = False
-
+        
+        # Resize the bounding boxes for faucets ( bigger hot zone)
+        resized_faucets = []
+        for faucet in best_faucet_detection:
+            class_name, bbox, confidence = faucet
+            resized_bbox = self.umath.resize_bbox(160, bbox)  # 160% increase in size
+            resized_faucets.append((class_name, resized_bbox, confidence))
+        
+        # Use the resized faucets for further processing
+        faucets = resized_faucets
         print("do_drinking: best pig: ", best_pig_detection)
         for faucet in best_faucet_detection:
             faucet_name, faucet_box, faucet_confidence = faucet
